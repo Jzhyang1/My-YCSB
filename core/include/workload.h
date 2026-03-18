@@ -48,7 +48,7 @@ struct Workload {
 	std::vector<unsigned long> recorded_keys;
 
 	/* logging (Debugging purposes) */
-	std::ostream op_log;
+	std::ofstream op_log;
 	static std::atomic<long> *op_log_counter; // needs to be set
 
 	Workload(long key_size, long value_size, long identifier);

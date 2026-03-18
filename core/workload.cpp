@@ -16,7 +16,7 @@ const char* operation_type_name[] = {
 
 Workload::Workload(long key_size, long value_size, long identifier)
 : key_size(key_size), value_size(value_size),
-  op_log(std::ofstream("workload_op_" + std::to_string(identifier) + ".log")) {
+  op_log("workload_op_" + std::to_string(identifier) + ".log") {
 	;
 }
 
