@@ -14,6 +14,8 @@ const char* operation_type_name[] = {
 	"UPDATE", "INSERT", "READ", "SCAN", "READ_MODIFY_WRITE"
 };
 
+std::atomic<long> Workload::op_log_counter{0};
+
 Workload::Workload(long key_size, long value_size, long identifier)
 : key_size(key_size), value_size(value_size),
   op_log("workload_op_" + std::to_string(identifier) + ".log") {
