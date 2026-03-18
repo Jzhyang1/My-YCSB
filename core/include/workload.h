@@ -1,6 +1,7 @@
 #ifndef YCSB_WORKLOAD_H
 #define YCSB_WORKLOAD_H
 
+#include <atomic>
 #include <cerrno>
 #include <cstring>
 #include <cstdlib>
@@ -49,7 +50,7 @@ struct Workload {
 
 	/* logging (Debugging purposes) */
 	std::ofstream op_log;
-	static std::atomic<long> op_log_counter{0}; // needs to be set
+	static std::atomic<long> op_log_counter; // needs to be set
 
 	Workload(long key_size, long value_size, long identifier);
 	virtual bool has_next_op() = 0;
