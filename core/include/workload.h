@@ -49,14 +49,14 @@ struct Workload {
 
 	/* logging (Debugging purposes) */
 	std::ofstream op_log;
-	static std::atomic<long> *op_log_counter; // needs to be set
+	static std::atomic<long> op_log_counter{0}; // needs to be set
 
 	Workload(long key_size, long value_size, long identifier);
 	virtual bool has_next_op() = 0;
 
 	inline void get_next_op(Operation *op) {
 		this->next_op(op);
-		long op_id = (*op_log_counter)++;
+		long op_id = op_log_counter.fetch_add(1);
 		
 		if (op->type == UPDATE || op->type == INSERT || op->type == READ_MODIFY_WRITE) {
 			this->op_log << op_id << " " << operation_type_name[op->type] << " " << op->key_buffer << " " << op->value_buffer << std::endl;
