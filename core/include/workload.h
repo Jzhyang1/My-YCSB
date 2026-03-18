@@ -47,11 +47,31 @@ struct Workload {
 	bool record_keys = false;
 	std::vector<unsigned long> recorded_keys;
 
-	Workload(long key_size, long value_size);
-	virtual void next_op(Operation *op) = 0;
+	/* logging (Debugging purposes) */
+	std::ostream op_log;
+	static std::atomic<long> *op_log_counter; // needs to be set
+
+	Workload(long key_size, long value_size, long identifier);
 	virtual bool has_next_op() = 0;
 
+	inline void get_next_op(Operation *op) {
+		this->next_op(op);
+		long op_id = (*op_log_counter)++;
+		
+		if (op->type == UPDATE || op->type == INSERT || op->type == READ_MODIFY_WRITE) {
+			this->op_log << op_id << " " << operation_type_name[op->type] << " " << op->key_buffer << " " << op->value_buffer << std::endl;
+		} else if (op->type == READ) {
+			this->op_log << op_id << " " << operation_type_name[op->type] << " " << op->key_buffer << std::endl;
+		} else if (op->type == SCAN) {
+			this->op_log << op_id << " " << operation_type_name[op->type] << " " << op->key_buffer << " scan_length=" << op->scan_length << std::endl;
+		} else {
+			this->op_log << op_id << " UNKNOWN_OP_TYPE" << std::endl;
+		}
+	}
+
 protected:
+	virtual void next_op(Operation *op) = 0;
+
 	static long generate_random_long(unsigned int *seedp);
 	static double generate_random_double(unsigned int *seedp);
 };

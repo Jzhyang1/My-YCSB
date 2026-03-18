@@ -14,8 +14,9 @@ const char* operation_type_name[] = {
 	"UPDATE", "INSERT", "READ", "SCAN", "READ_MODIFY_WRITE"
 };
 
-Workload::Workload(long key_size, long value_size)
-: key_size(key_size), value_size(value_size) {
+Workload::Workload(long key_size, long value_size, long identifier)
+: key_size(key_size), value_size(value_size),
+  op_log(std::ofstream("workload_op_" + std::to_string(identifier) + ".log")) {
 	;
 }
 
@@ -29,7 +30,7 @@ double Workload::generate_random_double(unsigned int *seedp) {
 
 UniformWorkload::UniformWorkload(long key_size, long value_size, long scan_length, long nr_entry,
                                  long nr_op, struct OpProportion op_prop, unsigned int seed)
-: Workload(key_size, value_size), scan_length(scan_length), nr_entry(nr_entry), nr_op(nr_op), op_prop(op_prop), seed(seed), cur_nr_op(0) {
+: Workload(key_size, value_size, seed), scan_length(scan_length), nr_entry(nr_entry), nr_op(nr_op), op_prop(op_prop), seed(seed), cur_nr_op(0) {
 	sprintf(this->key_format, "%%0%ldld", key_size - 1);
 }
 
@@ -81,7 +82,7 @@ void UniformWorkload::generate_value_string(char *value_buffer) {
 
 ZipfianWorkload::ZipfianWorkload(long key_size, long value_size, long scan_length, long nr_entry, long nr_op,
                                  struct OpProportion op_prop, double zipfian_constant, unsigned int seed)
-: Workload(key_size, value_size), scan_length(scan_length), nr_entry(nr_entry), nr_op(nr_op), op_prop(op_prop),
+: Workload(key_size, value_size, seed), scan_length(scan_length), nr_entry(nr_entry), nr_op(nr_op), op_prop(op_prop),
   zipfian_constant(zipfian_constant), seed(seed), cur_nr_op(0) {
 	sprintf(this->key_format, "%%0%ldlu", key_size - 1);
 
@@ -230,7 +231,7 @@ void ZipfianWorkload::generate_value_string(char *value_buffer) {
 }
 
 InitWorkload::InitWorkload(long nr_entry, long start_key, long key_size, long value_size, unsigned int seed)
-: Workload(key_size, value_size), nr_entry(nr_entry), start_key(start_key), cur_nr_entry(0), seed(seed) {
+: Workload(key_size, value_size, seed), nr_entry(nr_entry), start_key(start_key), cur_nr_entry(0), seed(seed) {
 	sprintf(this->key_format, "%%0%ldld", key_size - 1);
 	// Generate a random shuffle of all keys from 0 to nr_entry - 1
 	printf("Generating a random shuffle of all keys from 0 to %ld - 1\n", nr_entry);
@@ -275,7 +276,7 @@ void InitWorkload::generate_value_string(char *value_buffer) {
 
 LatestWorkload::LatestWorkload(long key_size, long value_size, long nr_entry, long nr_op, double read_ratio,
                                double zipfian_constant, unsigned int seed)
-	: Workload(key_size, value_size), nr_entry(nr_entry), nr_op(nr_op), read_ratio(read_ratio),
+	: Workload(key_size, value_size, seed), nr_entry(nr_entry), nr_op(nr_op), read_ratio(read_ratio),
 	  zipfian_constant(zipfian_constant), seed(seed), cur_nr_op(0), cur_ack_key(0) {
 	sprintf(this->key_format, "%%0%ldlu", key_size - 1);
 
@@ -378,7 +379,7 @@ void LatestWorkload::generate_value_string(char *value_buffer) {
 }
 
 TraceWorkload::TraceWorkload(long key_size, long value_size, std::string trace_path, unsigned int seed)
-: Workload(key_size, value_size), trace_path(trace_path), seed(seed) {
+: Workload(key_size, value_size, seed), trace_path(trace_path), seed(seed) {
 	// no-op
 }
 
