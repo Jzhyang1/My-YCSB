@@ -18,8 +18,8 @@ std::atomic<long> Workload::op_log_counter{0};
 
 Workload::Workload(long key_size, long value_size, long identifier)
 : key_size(key_size), value_size(value_size),
-  op_log("workload_op_" + std::to_string(identifier) + ".log") {
-	op_log << "PID: " << getpid() << std::endl;
+  op_log("workload_op_" + std::to_string(getpid()) + "(" + std::to_string(identifier) + ").log") {
+	;
 }
 
 long Workload::generate_random_long(unsigned int *seedp) {
