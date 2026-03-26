@@ -51,6 +51,7 @@ struct Workload {
 	/* logging (Debugging purposes) */
 	std::ofstream op_log;
 	static std::atomic<long> op_log_counter; // needs to be set
+	static char* command_line_str;
 
 	Workload(long key_size, long value_size, long identifier);
 	virtual bool has_next_op() = 0;

@@ -1,6 +1,7 @@
 #include <iostream>
 #include<unistd.h>
 #include "worker.h"
+#include "workload.h"
 #include "leveldb_client.h"
 #include "leveldb_config.h"
 
@@ -9,6 +10,7 @@ int main(int argc, char *argv[]) {
 		printf("Usage: %s <config file>\n", argv[0]);
 		return -EINVAL;
 	}
+	Workload::command_line_str = argv[0];
 	YAML::Node file = YAML::LoadFile(argv[1]);
 	LevelDBConfig config = LevelDBConfig::parse_yaml(file);
 

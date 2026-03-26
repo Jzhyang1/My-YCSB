@@ -1,5 +1,6 @@
 #include <iostream>
 #include "worker.h"
+#include "workload.h"
 #include "memcached_client.h"
 #include "memcached_config.h"
 #include "yaml-cpp/yaml.h"
@@ -9,6 +10,7 @@ int main(int argc, char *argv[]) {
 		printf("Usage: %s <config file> <redis port (optional)>\n", argv[0]);
 		return -EINVAL;
 	}
+	Workload::command_line_str = argv[0];
 	YAML::Node file = YAML::LoadFile(argv[1]);
 	MemcachedConfig config = MemcachedConfig::parse_yaml(file);
 	int port = config.memcached.port;
