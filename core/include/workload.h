@@ -49,7 +49,6 @@ struct Workload {
 	std::vector<unsigned long> recorded_keys;
 
 	/* logging (Debugging purposes) */
-	std::ofstream op_log;
 	static std::atomic<long> op_log_counter; // needs to be set
 	static char* command_line_str;
 
@@ -59,16 +58,6 @@ struct Workload {
 	inline void get_next_op(Operation *op) {
 		this->next_op(op);
 		long op_id = op_log_counter.fetch_add(1);
-		
-		if (op->type == UPDATE || op->type == INSERT || op->type == READ_MODIFY_WRITE) {
-			this->op_log << op_id << " " << operation_type_name[op->type] << " " << op->key_buffer << " " << op->value_buffer << std::endl;
-		} else if (op->type == READ) {
-			this->op_log << op_id << " " << operation_type_name[op->type] << " " << op->key_buffer << std::endl;
-		} else if (op->type == SCAN) {
-			this->op_log << op_id << " " << operation_type_name[op->type] << " " << op->key_buffer << " scan_length=" << op->scan_length << std::endl;
-		} else {
-			this->op_log << op_id << " UNKNOWN_OP_TYPE" << std::endl;
-		}
 	}
 
 protected:

@@ -18,8 +18,8 @@ std::atomic<long> Workload::op_log_counter{0};
 char* Workload::command_line_str = nullptr;
 
 Workload::Workload(long key_size, long value_size, long identifier)
-: key_size(key_size), value_size(value_size),
-  op_log("workload_op_" + std::to_string(getpid()) + "(" + std::to_string(identifier) + ").log") {
+: key_size(key_size), value_size(value_size) {
+	std::ofstream op_log("workload_op_" + std::to_string(getpid()) + "(" + std::to_string(identifier) + ").log");
 	op_log << "command_line: " << (Workload::command_line_str ? Workload::command_line_str : "") << std::endl;
 }
 
