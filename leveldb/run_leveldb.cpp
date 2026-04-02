@@ -15,7 +15,7 @@ int main(int argc, char *argv[]) {
 			std::cerr << "Failed to open named pipe at " << pipe_path << std::endl;
 			return -EINVAL;
 		}
-		std::getchar(pipe); // wait until we can read something from the pipe
+		pipe.get(); // wait until we can read something from the pipe
 		pipe.close();
 		// Now we can proceed to run the workload
 	} else if (argc != 2) {
