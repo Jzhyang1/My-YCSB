@@ -6,7 +6,19 @@
 #include "leveldb_config.h"
 
 int main(int argc, char *argv[]) {
-	if (argc != 2) {
+	if (argc == 3) {
+		// the third argument is a named pipe that we spin on
+		// until data is written to it, which signals us to start the workload
+		const char* pipe_path = argv[2];
+		std::ifstream pipe(pipe_path);
+		if (!pipe.is_open()) {
+			std::cerr << "Failed to open named pipe at " << pipe_path << std::endl;
+			return -EINVAL;
+		}
+		std::getchar(pipe); // wait until we can read something from the pipe
+		pipe.close();
+		// Now we can proceed to run the workload
+	} else if (argc != 2) {
 		printf("Usage: %s <config file>\n", argv[0]);
 		return -EINVAL;
 	}
