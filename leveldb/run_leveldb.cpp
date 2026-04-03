@@ -102,8 +102,7 @@ int main(int argc, char *argv[]) {
 													runtime_seconds,
 			                                        config.workload.next_op_interval_ns,
 			                                        nullptr);
-		}
-		else if (config.workload.request_distribution == "trace") {
+		} else if (config.workload.request_distribution == "trace") {
 			run_trace_workload_with_op_measurement(i == 0 ? "Trace (Warm-Up)" : "Trace",
 			                                       &factory,
 			                                       config.database.key_size,

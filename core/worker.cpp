@@ -157,7 +157,7 @@ void run_init_trace_workload_with_op_measurement(const char *task, ClientFactory
 }
 
 void run_sanity_workload_with_op_measurement(const char *task, ClientFactory *factory, long nr_entry, long key_size, long value_size,
-                                              long scan_length, int nr_thread, struct OpProportion op_prop, long nr_op, long runtime_seconds, long next_op_interval_ns,
+                                              int nr_thread, struct OpProportion op_prop, long nr_op, long runtime_seconds, long next_op_interval_ns,
                                               const char *latency_file) {
 	SanityWorkload **workload_arr = new SanityWorkload *[nr_thread];
 	for (unsigned int thread_index = 0; thread_index < nr_thread; ++thread_index) {
