@@ -57,6 +57,7 @@ int LevelDBClient::do_read(char *key_buffer, char **value) {
 	std::string value_str;
 
 	leveldb::ReadOptions read_options = leveldb::ReadOptions();
+	read_options.fill_cache = false;
 
 	status = this->db->Get(read_options, key_buffer, &value_str);
 	if (!status.ok()) {
