@@ -34,10 +34,18 @@ double Workload::generate_random_double(unsigned int *seedp) {
 std::atomic<long> SanityWorkload::op_log_counter{0};
 SanityWorkload::SanityWorkload(long key_size, long value_size, long nr_op, long identifier)
 : Workload(key_size, value_size, identifier), nr_op(nr_op), cur_nr_op(0),
-	op_log("sanity_workload_op_" + std::to_string(getpid()) + "(" + std::to_string(identifier) + ").log") {
+		op_log("sanity_workload_op_" + std::to_string(getpid()) + "(" + std::to_string(identifier) + ").log") {
+	sprintf(this->key_format, "%%0%ldld", key_size - 1);
 }
 
 bool SanityWorkload::has_next_op() {
+	return this->cur_nr_op < this->nr_op;
+}
+
+void SanityWorkload::next_op(Operation *op) {
+	if (!this->has_next_op())
+		throw std::invalid_argument("does not have next op");
+		
 	// Here we do logging
 	long op_id = op_log_counter.fetch_add(1);
 	if (op->type == UPDATE || op->type == INSERT || op->type == READ_MODIFY_WRITE) {
@@ -50,13 +58,6 @@ bool SanityWorkload::has_next_op() {
 		this->op_log << op_id << " UNKNOWN_OP_TYPE" << std::endl;
 	}
 	
-	return this->cur_nr_op < this->nr_op;
-}
-
-void SanityWorkload::next_op(Operation *op) {
-	if (!this->has_next_op())
-		throw std::invalid_argument("does not have next op");
-		
 	// Our sanity check always reads the same key, and expects the same value back.
 	op->type = READ;
 	long key = 777;
@@ -64,6 +65,10 @@ void SanityWorkload::next_op(Operation *op) {
 		
 	++this->cur_nr_op;
 	op->is_last_op = !this->has_next_op();
+}
+
+void SanityWorkload::generate_key_string(char *key_buffer, long key) {
+	sprintf(key_buffer, this->key_format, key);
 }
 
 
