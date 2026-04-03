@@ -9,6 +9,7 @@
 #include "leveldb/status.h"
 
 #include "leveldb_client.h"
+#include <sys/cachectl.h>
 
 std::atomic<unsigned int> key_fails = 0;
 
@@ -30,6 +31,7 @@ repeat:
 		ret = this->do_insert(op->key_buffer, op->value_buffer);
 		break;
 	case READ:
+		cacheflush(DCACHE);
 		ret = this->do_read(op->key_buffer, &op->value_buffer);
 		break;
 	case SCAN:
