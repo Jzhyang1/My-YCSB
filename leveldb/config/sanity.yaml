@@ -30,7 +30,7 @@ workload:
 
 # LevelDB Parameters
 leveldb:
-  data_dir: "/mydata/leveldb_temp"
-  options_file: "/mydata/My-YCSB/rocksdb/config/rocksdb_rubble_16gb_config.ini"
+  data_dir: "/data/leveldb_temp/0"
+  options_file: "/data/cache_ext/My-YCSB/rocksdb/config/rocksdb_rubble_16gb_config.ini"
   cache_size: 100000000
   print_stats: true
