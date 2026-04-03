@@ -74,7 +74,7 @@ struct SanityWorkload : public Workload {
 
 	/* states */
 	long cur_nr_op;
-	std::ostream op_log;
+	std::ofstream op_log;
 	static std::atomic<long> op_log_counter; // needs to be set
 	char key_format[key_format_len];
 
