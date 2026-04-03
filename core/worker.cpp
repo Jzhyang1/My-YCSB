@@ -156,6 +156,22 @@ void run_init_trace_workload_with_op_measurement(const char *task, ClientFactory
 	delete workload;
 }
 
+void run_sanity_workload_with_op_measurement(const char *task, ClientFactory *factory, long nr_entry, long key_size, long value_size,
+                                              long scan_length, int nr_thread, struct OpProportion op_prop, long nr_op, long runtime_seconds, long next_op_interval_ns,
+                                              const char *latency_file) {
+	SanityWorkload **workload_arr = new SanityWorkload *[nr_thread];
+	for (unsigned int thread_index = 0; thread_index < nr_thread; ++thread_index) {
+		workload_arr[thread_index] = new SanityWorkload(key_size, value_size, nr_op, thread_index);
+	}
+
+	run_workload_with_op_measurement(task, factory, (Workload **)workload_arr, nr_thread, nr_op, runtime_seconds, nr_thread * nr_op, next_op_interval_ns, latency_file);
+
+	for (int thread_index = 0; thread_index < nr_thread; ++thread_index) {
+		delete workload_arr[thread_index];
+	}
+	delete[] workload_arr;
+}
+
 void run_uniform_workload_with_op_measurement(const char *task, ClientFactory *factory, long nr_entry, long key_size, long value_size,
                                               long scan_length, int nr_thread, struct OpProportion op_prop, long nr_op, long runtime_seconds, long next_op_interval_ns,
                                               const char *latency_file) {

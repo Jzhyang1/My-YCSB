@@ -49,7 +49,20 @@ int main(int argc, char *argv[]) {
 			nr_op = config.workload.nr_op;
 			runtime_seconds = config.workload.runtime_seconds;
 		}
-		if (config.workload.request_distribution == "uniform") {
+		
+		if (config.workload.request_distribution == "sanity") {
+			run_sanity_workload_with_op_measurement(i == 0 ? "Sanity (Warm-Up)" : "Sanity",
+													&factory,
+													config.database.nr_entry,
+													config.database.key_size,
+													config.database.value_size,
+													config.workload.nr_thread,
+													op_prop,
+													nr_op,
+													runtime_seconds,
+													config.workload.next_op_interval_ns,
+													nullptr);
+		} else if (config.workload.request_distribution == "uniform") {
 			run_uniform_workload_with_op_measurement(i == 0 ? "Uniform (Warm-Up)" : "Uniform",
 			                                         &factory,
 			                                         config.database.nr_entry,

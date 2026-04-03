@@ -14,7 +14,6 @@ const char* operation_type_name[] = {
 	"UPDATE", "INSERT", "READ", "SCAN", "READ_MODIFY_WRITE"
 };
 
-std::atomic<long> Workload::op_log_counter{0};
 char* Workload::command_line_str = nullptr;
 
 Workload::Workload(long key_size, long value_size, long identifier)
@@ -30,6 +29,43 @@ long Workload::generate_random_long(unsigned int *seedp) {
 double Workload::generate_random_double(unsigned int *seedp) {
 	return ((double)rand_r(seedp)) / RAND_MAX;
 }
+
+
+std::atomic<long> SanityWorkload::op_log_counter{0};
+SanityWorkload::SanityWorkload(long key_size, long value_size, long nr_op, long identifier)
+: Workload(key_size, value_size, identifier), nr_op(nr_op), cur_nr_op(0),
+	op_log("sanity_workload_op_" + std::to_string(getpid()) + "(" + std::to_string(identifier) + ").log") {
+}
+
+bool SanityWorkload::has_next_op() {
+	// Here we do logging
+	long op_id = op_log_counter.fetch_add(1);
+	if (op->type == UPDATE || op->type == INSERT || op->type == READ_MODIFY_WRITE) {
+		this->op_log << op_id << " " << operation_type_name[op->type] << " " << op->key_buffer << " " << op->value_buffer << std::endl;
+	} else if (op->type == READ) {
+		this->op_log << op_id << " " << operation_type_name[op->type] << " " << op->key_buffer << std::endl;
+	} else if (op->type == SCAN) {
+		this->op_log << op_id << " " << operation_type_name[op->type] << " " << op->key_buffer << " scan_length=" << op->scan_length << std::endl;
+	} else {
+		this->op_log << op_id << " UNKNOWN_OP_TYPE" << std::endl;
+	}
+	
+	return this->cur_nr_op < this->nr_op;
+}
+
+void SanityWorkload::next_op(Operation *op) {
+	if (!this->has_next_op())
+		throw std::invalid_argument("does not have next op");
+		
+	// Our sanity check always reads the same key, and expects the same value back.
+	op->type = READ;
+	long key = 777;
+	this->generate_key_string(op->key_buffer, key);
+		
+	++this->cur_nr_op;
+	op->is_last_op = !this->has_next_op();
+}
+
 
 UniformWorkload::UniformWorkload(long key_size, long value_size, long scan_length, long nr_entry,
                                  long nr_op, struct OpProportion op_prop, unsigned int seed)

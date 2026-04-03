@@ -49,7 +49,6 @@ struct Workload {
 	std::vector<unsigned long> recorded_keys;
 
 	/* logging (Debugging purposes) */
-	static std::atomic<long> op_log_counter; // needs to be set
 	static char* command_line_str;
 
 	Workload(long key_size, long value_size, long identifier);
@@ -57,7 +56,6 @@ struct Workload {
 
 	inline void get_next_op(Operation *op) {
 		this->next_op(op);
-		long op_id = op_log_counter.fetch_add(1);
 	}
 
 protected:
@@ -65,6 +63,20 @@ protected:
 
 	static long generate_random_long(unsigned int *seedp);
 	static double generate_random_double(unsigned int *seedp);
+};
+
+struct SanityWorkload : public Workload {
+	/* configuration */
+	long nr_op;
+
+	/* states */
+	long cur_nr_op;
+	std::ostream op_log;
+	static std::atomic<long> op_log_counter; // needs to be set
+
+	SanityWorkload(long key_size, long value_size, long nr_op, long identifier);
+	void next_op(Operation *op) override;
+	bool has_next_op() override;
 };
 
 struct UniformWorkload : public Workload {
