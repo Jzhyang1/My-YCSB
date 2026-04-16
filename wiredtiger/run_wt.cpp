@@ -9,7 +9,7 @@ int main(int argc, char *argv[]) {
 		printf("Usage: %s <config file>\n", argv[0]);
 		return -EINVAL;
 	}
-	Workload::command_line_str = argv[0];
+	Workload::pipe_name = argv[0];
 	YAML::Node file = YAML::LoadFile(argv[1]);
 	WiredTigerConfig config = WiredTigerConfig::parse_yaml(file);
 

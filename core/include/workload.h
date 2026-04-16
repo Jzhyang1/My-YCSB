@@ -49,7 +49,7 @@ struct Workload {
 	std::vector<unsigned long> recorded_keys;
 
 	/* logging (Debugging purposes) */
-	static char* command_line_str;
+	std::string pipe_name;
 
 	Workload(long key_size, long value_size, long identifier);
 	virtual bool has_next_op() = 0;
