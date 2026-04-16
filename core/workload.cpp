@@ -27,7 +27,6 @@ Workload::Workload(long key_size, long value_size, long identifier)
 	std::ofstream bwd_pipe(bwd_pipe_name);
 	if (!bwd_pipe.is_open()) {
 		std::cerr << "Failed to open named pipe at " << bwd_pipe_name << std::endl;
-		return -EINVAL;
 	}
 	// write our PID to the pipe
 	bwd_pipe << getpid() << std::endl;
@@ -37,7 +36,6 @@ Workload::Workload(long key_size, long value_size, long identifier)
 	std::ifstream fwd_pipe(fwd_pipe_name);
 	if (!fwd_pipe.is_open()) {
 		std::cerr << "Failed to open named pipe at " << fwd_pipe_name << std::endl;
-		return -EINVAL;
 	}
 	fwd_pipe.get(); // wait until we can read something from the pipe
 	fwd_pipe.close();
