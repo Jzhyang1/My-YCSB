@@ -5,18 +5,32 @@
 #include "leveldb_client.h"
 #include "leveldb_config.h"
 
+// Usage: ./run_leveldb <config file> <signal pipe name>
+
 int main(int argc, char *argv[]) {
 	if (argc == 3) {
 		// the third argument is a named pipe that we spin on
 		// until data is written to it, which signals us to start the workload
-		const char* pipe_path = argv[2];
-		std::ifstream pipe(pipe_path);
-		if (!pipe.is_open()) {
-			std::cerr << "Failed to open named pipe at " << pipe_path << std::endl;
+		string pipe_base_name{argv[2]};
+		string bwd_pipe_name = pipe_base_name + ".bwd";
+		
+		std::ofstream bwd_pipe(bwd_pipe_name);
+		if (!bwd_pipe.is_open()) {
+			std::cerr << "Failed to open named pipe at " << bwd_pipe_name << std::endl;
 			return -EINVAL;
 		}
-		pipe.get(); // wait until we can read something from the pipe
-		pipe.close();
+		// write our PID to the pipe
+		bwd_pipe << getpid() << std::endl;
+		bwd_pipe.close();
+
+		string fwd_pipe_name = pipe_base_name + ".fwd";
+		std::ifstream fwd_pipe(fwd_pipe_name);
+		if (!fwd_pipe.is_open()) {
+			std::cerr << "Failed to open named pipe at " << fwd_pipe_name << std::endl;
+			return -EINVAL;
+		}
+		fwd_pipe.get(); // wait until we can read something from the pipe
+		fwd_pipe.close();
 		// Now we can proceed to run the workload
 	} else if (argc != 2) {
 		printf("Usage: %s <config file>\n", argv[0]);
